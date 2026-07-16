@@ -280,19 +280,10 @@ function HeartLine({ T }) {
   );
 }
 
-function StyleCard({ rank, style, image, onUpload, onRemove, T }) {
+function StyleCard({ rank, style, T }) {
   const t = T || THEMES.woman;
-  const inputRef = useRef(null);
   const rankColors = [t.deep, t.mid, t.light];
   const medals = ["🥇","🥈","🥉"];
-  const handleFile = e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => onUpload(ev.target.result);
-    reader.readAsDataURL(file);
-    e.target.value = "";
-  };
   return (
     <div style={{ background: "#fff", borderRadius: 16, border: `1.5px solid ${t.light}`, overflow: "hidden", boxShadow: `0 4px 16px ${t.deep}18`, display: "flex", flexDirection: "column" }}>
       <div style={{ background: `linear-gradient(135deg, ${t.pale}, ${t.rose})`, padding: "10px 10px", display: "flex", alignItems: "center", gap: 6, borderBottom: `1px solid ${t.light}` }}>
@@ -302,22 +293,6 @@ function StyleCard({ rank, style, image, onUpload, onRemove, T }) {
           <div style={{ fontSize: 9, color: t.subtext }}>{medals[rank]} とても似合う</div>
         </div>
       </div>
-      <div onClick={() => !image && inputRef.current.click()} style={{ width: "100%", aspectRatio: "3/4", background: image ? "transparent" : `linear-gradient(160deg, ${t.palest}, ${t.rose})`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: image ? "default" : "pointer", position: "relative", overflow: "hidden" }}>
-        {image ? (
-          <>
-            <img src={image} alt={style.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            <button onClick={e => { e.stopPropagation(); onRemove(); }} style={{ position: "absolute", top: 4, right: 4, width: 20, height: 20, borderRadius: "50%", background: `${t.deep}dd`, color: "#fff", border: "none", fontSize: 11, cursor: "pointer" }}>✕</button>
-            <button onClick={e => { e.stopPropagation(); inputRef.current.click(); }} style={{ position: "absolute", bottom: 4, right: 4, background: `${t.deep}dd`, color: "#fff", border: "none", borderRadius: 8, fontSize: 9, padding: "2px 6px", cursor: "pointer" }}>変更</button>
-          </>
-        ) : (
-          <>
-            <div style={{ fontSize: 24, marginBottom: 6, opacity: 0.4 }}>📷</div>
-            <div style={{ fontSize: 10, color: t.mid, textAlign: "center", lineHeight: 1.5 }}>タップして<br />画像を追加</div>
-            <div style={{ position: "absolute", inset: 6, border: `1px dashed ${t.light}`, borderRadius: 8, pointerEvents: "none" }} />
-          </>
-        )}
-      </div>
-      <input ref={inputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleFile} />
       <div style={{ padding: "8px 10px" }}>
         {style.points.map((p, i) => (
           <div key={i} style={{ display: "flex", gap: 4, marginBottom: 3 }}>
@@ -326,6 +301,44 @@ function StyleCard({ rank, style, image, onUpload, onRemove, T }) {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+// ChatGPTで生成した「3スタイル横並び1枚」の画像を貼り付けるカード
+function ComboImageCard({ image, onUpload, onRemove, T }) {
+  const t = T || THEMES.woman;
+  const inputRef = useRef(null);
+  const handleFile = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => onUpload(ev.target.result);
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+  return (
+    <div style={{ background: "#fff", borderRadius: 16, border: `1.5px solid ${t.light}`, overflow: "hidden", boxShadow: `0 4px 16px ${t.deep}18`, marginBottom: 16 }}>
+      <div style={{ background: `linear-gradient(135deg, ${t.pale}, ${t.rose})`, padding: "10px 12px", borderBottom: `1px solid ${t.light}` }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: t.text, fontFamily: "sans-serif" }}>📸 ChatGPTで生成した画像を貼り付け</div>
+        <div style={{ fontSize: 9, color: t.subtext, marginTop: 2 }}>3スタイルがまとまった画像を1枚だけアップロードしてください</div>
+      </div>
+      <div onClick={() => !image && inputRef.current.click()} style={{ width: "100%", minHeight: 160, background: image ? "transparent" : `linear-gradient(160deg, ${t.palest}, ${t.rose})`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: image ? "default" : "pointer", position: "relative", overflow: "hidden" }}>
+        {image ? (
+          <>
+            <img src={image} alt="3スタイルまとめ画像" style={{ width: "100%", height: "auto", display: "block" }} />
+            <button onClick={e => { e.stopPropagation(); onRemove(); }} style={{ position: "absolute", top: 6, right: 6, width: 24, height: 24, borderRadius: "50%", background: `${t.deep}dd`, color: "#fff", border: "none", fontSize: 12, cursor: "pointer" }}>✕</button>
+            <button onClick={e => { e.stopPropagation(); inputRef.current.click(); }} style={{ position: "absolute", bottom: 6, right: 6, background: `${t.deep}dd`, color: "#fff", border: "none", borderRadius: 8, fontSize: 10, padding: "3px 8px", cursor: "pointer" }}>変更</button>
+          </>
+        ) : (
+          <>
+            <div style={{ fontSize: 28, marginBottom: 6, opacity: 0.4 }}>📷</div>
+            <div style={{ fontSize: 11, color: t.mid, textAlign: "center", lineHeight: 1.6 }}>タップして<br />画像を追加</div>
+            <div style={{ position: "absolute", inset: 8, border: `1px dashed ${t.light}`, borderRadius: 8, pointerEvents: "none" }} />
+          </>
+        )}
+      </div>
+      <input ref={inputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleFile} />
     </div>
   );
 }
@@ -470,10 +483,8 @@ function ChatGPTGuide({ T }) {
 function Result({ form, mode, onReset }) {
   const T = THEMES[mode];
   const r = diagnose(form, mode);
-  const [images, setImages] = useState(["","",""]);
+  const [comboImage, setComboImage] = useState("");
   const [tab, setTab] = useState("main");
-  const setImage = (i, url) => setImages(prev => prev.map((img, idx) => idx === i ? url : img));
-  const removeImage = i => setImages(prev => prev.map((img, idx) => idx === i ? "" : img));
 
   return (
     <div>
@@ -491,9 +502,10 @@ function Result({ form, mode, onReset }) {
             <HeartLine T={T} />
             <div style={{ fontSize: 12, color: T.subtext, lineHeight: 1.8, marginTop: 8, background: T.palest, borderRadius: 10, padding: "10px 14px", border: `1px solid ${T.rose}` }}>{r.summary}</div>
           </div>
+          <ComboImageCard image={comboImage} onUpload={setComboImage} onRemove={() => setComboImage("")} T={T} />
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 16 }}>
             {r.top3.map((style, i) => (
-              <StyleCard key={i} rank={i} style={style} image={images[i]} onUpload={url => setImage(i, url)} onRemove={() => removeImage(i)} T={T} />
+              <StyleCard key={i} rank={i} style={style} T={T} />
             ))}
           </div>
           <PromptBox form={form} mode={mode} top3={r.top3} color={r.color} T={T} />
@@ -629,6 +641,34 @@ export default function App() {
                 </div>
               )}
 
+              {step === 1 && (
+                <div className="fi">
+                  <div style={{ marginBottom: 18 }}><TLabel T={T}>髪量</TLabel><SelectGrid options={hairVolumes} value={form.hairVolume} onChange={v => update("hairVolume", v)} T={T} /></div>
+                  <div style={{ marginBottom: 18 }}><TLabel T={T}>髪質</TLabel><SelectGrid options={hairTextures} value={form.hairTexture} onChange={v => update("hairTexture", v)} T={T} /></div>
+                  <div style={{ marginBottom: 18 }}><TLabel T={T}>ライフスタイル</TLabel><SelectGrid options={lifestyles} value={form.lifestyle} onChange={v => update("lifestyle", v)} T={T} /></div>
+                  {showPC && <div style={{ marginBottom: 18 }}><TLabel T={T}>パーソナルカラー</TLabel><SelectGrid options={pcColors} value={form.pcColor} onChange={v => update("pcColor", v)} T={T} /></div>}
+                  <div style={{ marginBottom: 8 }}><TLabel T={T}>お悩み・希望（複数可）</TLabel><CheckGrid options={concernOpts} values={form.concerns} onChange={v => update("concerns", v)} T={T} /></div>
+                  <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
+                    <button onClick={() => setStep(0)} style={{ flex: 1, padding: "12px 0", background: "transparent", border: `1.5px solid ${T.light}`, borderRadius: 30, color: T.mid, fontSize: 13, cursor: "pointer" }}>← 戻る</button>
+                    <button onClick={() => setDone(true)} disabled={!ok1} style={{ flex: 2, padding: "13px 0", background: ok1 ? `linear-gradient(135deg, ${T.deep}, ${T.mid})` : T.rose, border: "none", borderRadius: 30, color: ok1 ? "#fff" : T.light, fontSize: 14, cursor: ok1 ? "pointer" : "default", boxShadow: ok1 ? `0 4px 14px ${T.deep}44` : "none" }}>診断する ✨</button>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="fi">
+              <Result form={form} mode={mode} onReset={() => { setDone(false); setStep(0); setForm(initialForm); }} />
+            </div>
+          )}
+        </div>
+
+        <div style={{ textAlign: "center", marginTop: 14, fontSize: 10, color: T.mid }}>
+          ✦ 本診断はAIロジックによる提案です。実際の施術は美容師にご相談ください ✦
+        </div>
+      </div>
+    </div>
+  );
+}
               {step === 1 && (
                 <div className="fi">
                   <div style={{ marginBottom: 18 }}><TLabel T={T}>髪量</TLabel><SelectGrid options={hairVolumes} value={form.hairVolume} onChange={v => update("hairVolume", v)} T={T} /></div>
